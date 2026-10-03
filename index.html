@@ -21,27 +21,28 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <div class="page">
-<header class="mast">
-  <img src="icon.png" width="88" height="88" alt="APCD logo: white slab letters A P C D in eight horizontal stripes on blue">
-  <div>
-    <h1>APCD</h1>
-    <p class="sub">Auto-Project-Context-Doc</p>
-  </div>
-</header>
-
+<aside class="side">
+  <a class="brand" href="./">
+    <img src="icon.png" width="150" height="150" alt="APCD logo: white slab letters A P C D in eight horizontal stripes on blue">
+    <div><p class="name">APCD</p><p class="sub">Auto-Project-Context-Doc</p></div>
+  </a>
+<nav aria-label="On this page"><p>Contents</p><ul>
+<li><a href="#install">Install</a></li><li><a href="#use">How to use</a></li><li><a href="#output">What you get</a></li><li><a href="#compat">What works, what doesn&rsquo;t</a></li><li><a href="#safe">Safe by design</a></li><li><a href="#links">Links</a></li></ul></nav>
+<nav aria-label="Site"><p>Pages</p><ul><li><a href="./" aria-current="page">Home</a></li><li><a href="privacy/">Privacy</a></li><li><a href="terms/">Terms</a></li></ul></nav>
+</aside>
 <main id="main">
+<h1>Auto-Project-Context-Doc</h1>
 <p class="tag">Concise project docs and a Progress list, so any new AI coding session picks up where you left off.</p>
-
 <hr class="stripes">
+
 <section id="install" aria-labelledby="h-install">
-<h2 id="h-install"><span class="n">1</span>Install</h2>
+<h2 id="h-install">Install</h2>
 <div class="code"><pre>claude plugin marketplace add Karthikeshwar1/APCD</pre></div>
 <div class="code"><pre>claude plugin install apcd@apcd</pre></div>
 </section>
 
-<hr class="stripes">
 <section id="use" aria-labelledby="h-use">
-<h2 id="h-use"><span class="n">2</span>How to use</h2>
+<h2 id="h-use">How to use</h2>
 <p>In any project run:</p>
 <div class="code"><pre>/apcd:run</pre></div>
 <p>It reads your repo, shows a short plan, and applies on &ldquo;yes&rdquo;. Safe to re-run. Keep the <code>apcd:</code> prefix, since <code>/run</code> is built in.</p>
@@ -49,16 +50,14 @@
 <div class="code"><pre>pick up where we left off</pre></div>
 </section>
 
-<hr class="stripes">
 <section id="output" aria-labelledby="h-output">
-<h2 id="h-output"><span class="n">3</span>What you get</h2>
+<h2 id="h-output">What you get</h2>
 <p><code>CLAUDE.md</code> (or <code>AGENTS.md</code> if you use other tools), and <code>docs/&lt;topic&gt;.md</code> for long topics.</p>
 <p>The entry file stays under about 150 lines, with these sections: Decisions, Rules, Docs, Progress (Next, Done last 3, Notes). Empty sections are omitted.</p>
 </section>
 
-<hr class="stripes">
 <section id="compat" aria-labelledby="h-compat">
-<h2 id="h-compat"><span class="n">4</span>What works, what doesn&rsquo;t</h2>
+<h2 id="h-compat">What works, what doesn&rsquo;t</h2>
 <h3>Works with</h3>
 <ul>
 <li>Claude Code (reads <code>CLAUDE.md</code>).</li>
@@ -75,9 +74,8 @@
 </ul>
 </section>
 
-<hr class="stripes">
 <section id="safe" aria-labelledby="h-safe">
-<h2 id="h-safe"><span class="n">5</span>Safe by design</h2>
+<h2 id="h-safe">Safe by design</h2>
 <ul>
 <li>Edits docs only, never your code, never <code>git commit</code>.</li>
 <li>Existing docs are copied verbatim to <code>docs/</code> before any shortening.</li>
@@ -87,9 +85,8 @@
 </ul>
 </section>
 
-<hr class="stripes">
 <section id="links" aria-labelledby="h-links">
-<h2 id="h-links"><span class="n">6</span>Links</h2>
+<h2 id="h-links">Links</h2>
 <ul>
 <li><a href="https://github.com/Karthikeshwar1/APCD">GitHub repository</a></li>
 <li><a href="https://github.com/Karthikeshwar1/APCD/issues">Issues (support)</a></li>
@@ -97,7 +94,6 @@
 </ul>
 </section>
 </main>
-
 <footer>
 <nav aria-label="Footer"><ul>
 <li><a href="./">Home</a></li>

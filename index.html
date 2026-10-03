@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>APCD, Auto-Project-Context-Doc</title>
+<meta name="description" content="APCD is a Claude Code plugin that writes concise project docs and a Progress list, so any new AI coding session picks up where you left off.">
+<link rel="canonical" href="https://karthikeshwar1.github.io/apcd-site/">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="APCD, Auto-Project-Context-Doc">
+<meta property="og:description" content="Concise project docs and a Progress list, so any new AI coding session picks up where you left off.">
+<meta property="og:url" content="https://karthikeshwar1.github.io/apcd-site/">
+<meta property="og:image" content="https://karthikeshwar1.github.io/apcd-site/icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="style.css">
+<script src="script.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+<header class="mast">
+  <img src="icon.png" width="88" height="88" alt="APCD logo: white slab letters A P C D in eight horizontal stripes on blue">
+  <div>
+    <h1>APCD</h1>
+    <p class="sub">Auto-Project-Context-Doc</p>
+  </div>
+</header>
+
+<main id="main">
+<p class="tag">Concise project docs and a Progress list, so any new AI coding session picks up where you left off.</p>
+
+<hr class="stripes">
+<section id="install" aria-labelledby="h-install">
+<h2 id="h-install"><span class="n">1</span>Install</h2>
+<div class="code"><pre>claude plugin marketplace add Karthikeshwar1/APCD</pre></div>
+<div class="code"><pre>claude plugin install apcd@apcd</pre></div>
+</section>
+
+<hr class="stripes">
+<section id="use" aria-labelledby="h-use">
+<h2 id="h-use"><span class="n">2</span>How to use</h2>
+<p>In any project run:</p>
+<div class="code"><pre>/apcd:run</pre></div>
+<p>It reads your repo, shows a short plan, and applies on &ldquo;yes&rdquo;. Safe to re-run. Keep the <code>apcd:</code> prefix, since <code>/run</code> is built in.</p>
+<p>Later, in any session or tool, say:</p>
+<div class="code"><pre>pick up where we left off</pre></div>
+</section>
+
+<hr class="stripes">
+<section id="output" aria-labelledby="h-output">
+<h2 id="h-output"><span class="n">3</span>What you get</h2>
+<p><code>CLAUDE.md</code> (or <code>AGENTS.md</code> if you use other tools), and <code>docs/&lt;topic&gt;.md</code> for long topics.</p>
+<p>The entry file stays under about 150 lines, with these sections: Decisions, Rules, Docs, Progress (Next, Done last 3, Notes). Empty sections are omitted.</p>
+</section>
+
+<hr class="stripes">
+<section id="compat" aria-labelledby="h-compat">
+<h2 id="h-compat"><span class="n">4</span>What works, what doesn&rsquo;t</h2>
+<h3>Works with</h3>
+<ul>
+<li>Claude Code (reads <code>CLAUDE.md</code>).</li>
+<li>Codex, Cursor, Copilot (read <code>AGENTS.md</code>).</li>
+<li>Gemini CLI (<code>GEMINI.md</code> gets <code>@AGENTS.md</code> added at the top).</li>
+<li>Aider (add <code>read: AGENTS.md</code> to <code>.aider.conf.yml</code> yourself).</li>
+</ul>
+<h3>Limits</h3>
+<ul>
+<li>Commit your docs before running it, then review the diff.</li>
+<li>Rules are advisory text, so small models skip them more often. On a very large hand-written entry file, haiku once in three runs rewrote it without keeping the copy (sonnet kept all facts).</li>
+<li>It may add a filler Next item on repos with no TODOs.</li>
+<li>Tested with headless Claude runs on fixtures.</li>
+</ul>
+</section>
+
+<hr class="stripes">
+<section id="safe" aria-labelledby="h-safe">
+<h2 id="h-safe"><span class="n">5</span>Safe by design</h2>
+<ul>
+<li>Edits docs only, never your code, never <code>git commit</code>.</li>
+<li>Existing docs are copied verbatim to <code>docs/</code> before any shortening.</li>
+<li>Existing progress trackers are linked, not duplicated.</li>
+<li>No secrets, emails or personal paths are written.</li>
+<li>Re-running with nothing changed is a no-op.</li>
+</ul>
+</section>
+
+<hr class="stripes">
+<section id="links" aria-labelledby="h-links">
+<h2 id="h-links"><span class="n">6</span>Links</h2>
+<ul>
+<li><a href="https://github.com/Karthikeshwar1/APCD">GitHub repository</a></li>
+<li><a href="https://github.com/Karthikeshwar1/APCD/issues">Issues (support)</a></li>
+<li>MIT license</li>
+</ul>
+</section>
+</main>
+
+<footer>
+<nav aria-label="Footer"><ul>
+<li><a href="./">Home</a></li>
+<li><a href="privacy/">Privacy</a></li>
+<li><a href="terms/">Terms</a></li>
+<li><a href="https://github.com/Karthikeshwar1/APCD">GitHub</a></li>
+</ul></nav>
+<p>APCD &middot; MIT License</p>
+</footer>
+</div>
+<div id="live" class="sr" role="status" aria-live="polite"></div>
+</body>
+</html>

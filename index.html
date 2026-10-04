@@ -20,60 +20,43 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<div class="page">
-<aside class="side">
-  <a class="brand" href="./">
-    <img src="icon.png" width="150" height="150" alt="APCD logo: white slab letters A P C D in eight horizontal stripes on blue">
-    <div><p class="name">APCD</p><p class="sub">Auto-Project-Context-Doc</p></div>
-  </a>
-<nav aria-label="On this page"><p>Contents</p><ul>
-<li><a href="#install">Install</a></li><li><a href="#use">How to use</a></li><li><a href="#output">What you get</a></li><li><a href="#compat">What works, what doesn&rsquo;t</a></li><li><a href="#safe">Safe by design</a></li><li><a href="#links">Links</a></li></ul></nav>
-<nav aria-label="Site"><p>Pages</p><ul><li><a href="./" aria-current="page">Home</a></li><li><a href="privacy/">Privacy</a></li><li><a href="terms/">Terms</a></li></ul></nav>
-</aside>
+<div class="window">
+<div class="titlebar" aria-hidden="true"><i></i><span>APCD &mdash; Auto-Project-Context-Doc</span></div>
+<div class="pane">
+<header class="mast">
+  <img src="icon.png" width="104" height="104" alt="APCD logo: white slab letters A P C D in eight horizontal stripes on blue">
+  <div><h1>APCD</h1><p class="sub">Auto-Project-Context-Doc</p></div>
+</header>
 <main id="main">
-<h1>Auto-Project-Context-Doc</h1>
 <p class="tag">Concise project docs and a Progress list, so any new AI coding session picks up where you left off.</p>
-<hr class="stripes">
 
-<section id="install" aria-labelledby="h-install">
-<h2 id="h-install">Install</h2>
+<section class="step" id="install" aria-labelledby="h-install">
+<span class="num" aria-hidden="true">1</span>
+<div><h2 id="h-install">Install</h2>
 <div class="code"><pre>claude plugin marketplace add Karthikeshwar1/APCD</pre></div>
-<div class="code"><pre>claude plugin install apcd@apcd</pre></div>
+<div class="code"><pre>claude plugin install apcd@apcd</pre></div></div>
 </section>
 
-<section id="use" aria-labelledby="h-use">
-<h2 id="h-use">How to use</h2>
-<p>In any project run:</p>
-<div class="code"><pre>/apcd:run</pre></div>
-<p>It reads your repo, shows a short plan, and applies on &ldquo;yes&rdquo;. Safe to re-run. Keep the <code>apcd:</code> prefix, since <code>/run</code> is built in.</p>
-<p>Later, in any session or tool, say:</p>
-<div class="code"><pre>pick up where we left off</pre></div>
+<section class="step" id="use" aria-labelledby="h-use">
+<span class="num" aria-hidden="true">2</span>
+<div><h2 id="h-use">Run it in any project</h2>
+<div class="code nocopy"><pre>/apcd:run</pre></div>
+<p>It reads your repo, shows a short plan, and applies on &ldquo;yes&rdquo;. Safe to re-run. Keep the <code>apcd:</code> prefix, since <code>/run</code> is built in.</p></div>
 </section>
 
+<section class="step" id="resume" aria-labelledby="h-resume">
+<span class="num" aria-hidden="true">3</span>
+<div><h2 id="h-resume">Pick up later</h2>
+<p>In any session or tool, say <q>pick up where we left off</q>.</p></div>
+</section>
+
+<div class="ref">
+<div class="cols">
 <section id="output" aria-labelledby="h-output">
 <h2 id="h-output">What you get</h2>
 <p><code>CLAUDE.md</code> (or <code>AGENTS.md</code> if you use other tools), and <code>docs/&lt;topic&gt;.md</code> for long topics.</p>
 <p>The entry file stays under about 150 lines, with these sections: Decisions, Rules, Docs, Progress (Next, Done last 3, Notes). Empty sections are omitted.</p>
 </section>
-
-<section id="compat" aria-labelledby="h-compat">
-<h2 id="h-compat">What works, what doesn&rsquo;t</h2>
-<h3>Works with</h3>
-<ul>
-<li>Claude Code (reads <code>CLAUDE.md</code>).</li>
-<li>Codex, Cursor, Copilot (read <code>AGENTS.md</code>).</li>
-<li>Gemini CLI (<code>GEMINI.md</code> gets <code>@AGENTS.md</code> added at the top).</li>
-<li>Aider (add <code>read: AGENTS.md</code> to <code>.aider.conf.yml</code> yourself).</li>
-</ul>
-<h3>Limits</h3>
-<ul>
-<li>Commit your docs before running it, then review the diff.</li>
-<li>Rules are advisory text, so small models skip them more often. On a very large hand-written entry file, haiku once in three runs rewrote it without keeping the copy (sonnet kept all facts).</li>
-<li>It may add a filler Next item on repos with no TODOs.</li>
-<li>Tested with headless Claude runs on fixtures.</li>
-</ul>
-</section>
-
 <section id="safe" aria-labelledby="h-safe">
 <h2 id="h-safe">Safe by design</h2>
 <ul>
@@ -84,16 +67,34 @@
 <li>Re-running with nothing changed is a no-op.</li>
 </ul>
 </section>
-
-<section id="links" aria-labelledby="h-links">
-<h2 id="h-links">Links</h2>
+</div>
+<div class="cols">
+<section id="compat" aria-labelledby="h-compat">
+<h2 id="h-compat">Works with</h2>
 <ul>
-<li><a href="https://github.com/Karthikeshwar1/APCD">GitHub repository</a></li>
-<li><a href="https://github.com/Karthikeshwar1/APCD/issues">Issues (support)</a></li>
-<li>MIT license</li>
+<li>Claude Code (reads <code>CLAUDE.md</code>).</li>
+<li>Codex, Cursor, Copilot (read <code>AGENTS.md</code>).</li>
+<li>Gemini CLI (<code>GEMINI.md</code> gets <code>@AGENTS.md</code> added at the top).</li>
+<li>Aider (add <code>read: AGENTS.md</code> to <code>.aider.conf.yml</code> yourself).</li>
 </ul>
 </section>
+<section id="limits" aria-labelledby="h-limits">
+<h2 id="h-limits">Limits</h2>
+<ul>
+<li>Commit your docs before running it, then review the diff.</li>
+<li>Rules are advisory text, so small models skip them more often. On a very large hand-written entry file, haiku once in three runs rewrote it without keeping the copy (sonnet kept all facts).</li>
+<li>It may add a filler Next item on repos with no TODOs.</li>
+<li>Tested with headless Claude runs on fixtures.</li>
+</ul>
+</section>
+</div>
+<section id="links" aria-labelledby="h-links">
+<h2 id="h-links">Links</h2>
+<p><a href="https://github.com/Karthikeshwar1/APCD">GitHub repository</a> &middot; <a href="https://github.com/Karthikeshwar1/APCD/issues">Issues (support)</a> &middot; MIT license</p>
+</section>
+</div>
 </main>
+</div>
 <footer>
 <nav aria-label="Footer"><ul>
 <li><a href="./">Home</a></li>
@@ -101,7 +102,6 @@
 <li><a href="terms/">Terms</a></li>
 <li><a href="https://github.com/Karthikeshwar1/APCD">GitHub</a></li>
 </ul></nav>
-<p>APCD &middot; MIT License</p>
 </footer>
 </div>
 <div id="live" class="sr" role="status" aria-live="polite"></div>

@@ -1,7 +1,7 @@
 document.documentElement.classList.add('js');
 (function(){
   var live=document.getElementById('live');
-  document.querySelectorAll('.code').forEach(function(box){
+  document.querySelectorAll('.code:not(.nocopy)').forEach(function(box){
     var b=document.createElement('button');
     b.type='button';b.textContent='Copy';
     b.setAttribute('aria-label','Copy to clipboard');

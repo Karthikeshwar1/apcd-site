@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Benchmark: APCD vs AI Orchestrators — Token Comparison</title>
+<meta name="description" content="Given the same spec at equal quality, which costs fewer tokens? Living benchmark comparing APCD against orchestrators.">
+<link rel="canonical" href="https://karthikeshwar1.github.io/apcd-site/comparison/">
+<link rel="icon" type="image/png" href="../icon.png">
+<link rel="apple-touch-icon" href="../icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Benchmark: APCD vs AI Orchestrators">
+<meta property="og:description" content="Given the same spec at equal quality, which costs fewer tokens? APCD vs AI orchestrators token benchmark.">
+<meta property="og:url" content="https://karthikeshwar1.github.io/apcd-site/comparison/">
+<meta property="og:image" content="https://karthikeshwar1.github.io/apcd-site/icon.png">
+<meta name="twitter:card" content="summary">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../style.css">
+<script src="../script.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="window">
+<div class="titlebar" aria-hidden="true"><i></i><span>Benchmark &mdash; APCD vs Orchestrators</span></div>
+<div class="pane">
+<header class="mast">
+  <a href="../"><img src="../icon.png" width="104" height="104" alt="APCD logo: white slab letters A P C D on blue"></a>
+  <div>
+    <h1>Token Benchmark</h1>
+    <p class="sub"><a href="../">&larr; Back to APCD</a> &middot; Living Document &middot; Updated Oct 13, 2026</p>
+  </div>
+</header>
+
+<!-- Quick Navigation Jump Bar -->
+<nav class="toc-nav" aria-label="Table of contents">
+  <span class="toc-title">Jump to:</span>
+  <ul class="toc-links">
+    <li><a href="#tldr">TL;DR</a></li>
+    <li><a href="#compare">1. What We Compare</a></li>
+    <li><a href="#setup">2. Setup</a></li>
+    <li><a href="#runs">3. All Runs</a></li>
+    <li><a href="#surface">4. Desktop vs CLI</a></li>
+    <li><a href="#findings">5. Findings</a></li>
+    <li><a href="#caveats">6. Caveats</a></li>
+    <li><a href="#reproduce">7. How to Run</a></li>
+  </ul>
+</nav>
+
+<main id="main">
+
+<!-- SECTION: TL;DR -->
+<section id="tldr" class="bench-section" aria-labelledby="h-tldr">
+  <h2 id="h-tldr">🎯 TL;DR</h2>
+  <p class="tag">Same app, same model (Sonnet 5.5, low effort), same quality: <strong>every run passed 30/30 API tests and 20/20 UI checks.</strong></p>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Comparison</th>
+          <th scope="col">Tokens Used</th>
+          <th scope="col">Speed</th>
+          <th scope="col">Runs Sampled</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Desktop app:</strong> Claude projects coordinator vs APCD</td>
+          <td>Projects used <strong class="highlight-val">1.6&times; more</strong></td>
+          <td>&ndash;</td>
+          <td>2 vs 1</td>
+        </tr>
+        <tr>
+          <td><strong>CLI:</strong> Claude Code + sub-agents vs APCD</td>
+          <td>Sub-agents used <strong class="highlight-val">1.1&ndash;1.3&times; more</strong> (1.15&times; on cost)</td>
+          <td>APCD <strong class="highlight-val">2&times; faster</strong></td>
+          <td>2 vs 3</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout-box">
+    <div class="callout-header">Why</div>
+    <p>An orchestrator adds a &ldquo;manager&rdquo; agent that re-reads its whole growing conversation on every step, and its sub-agents re-explore the code. <strong>APCD has no manager.</strong> One short project doc lets each fresh chat pick up exactly where the last one stopped.</p>
+  </div>
+
+  <blockquote class="note-quote">
+    <em>&ldquo;In my experience, orchestrator coordination hasn&rsquo;t been great yet. It&rsquo;s like manual shift vs auto transmission, back when auto transmissions were just introduced.&rdquo;</em> &mdash; Karthik, 2026-10-12
+  </blockquote>
+</section>
+
+<!-- SECTION 1: What we compare -->
+<section id="compare" class="bench-section" aria-labelledby="h-compare">
+  <h2 id="h-compare">1. What We Compare</h2>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Arm</th>
+          <th scope="col">How work is split</th>
+          <th scope="col">How context carries over</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge badge-p">P: APCD plugin</span></td>
+          <td>The human opens one new chat per milestone (6 chats)</td>
+          <td><code>CLAUDE.md</code> Progress list</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-o">O: orchestrator</span></td>
+          <td>A coordinator spawns one sub-agent per milestone (1 + 6)</td>
+          <td>The coordinator&rsquo;s handoff notes</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ul class="clean-list">
+    <li><strong>O flavours:</strong> the desktop <strong>Claude projects coordinator</strong>, and a <strong>CLI session + sub-agents</strong> (<code>claude -p</code>).</li>
+    <li><strong>Compare only on the same surface:</strong> Desktop vs CLI changes cost a lot by itself (<a href="#surface">&sect;4</a>).</li>
+    <li><strong>Scope:</strong> Token efficiency only. Coordination quality isn&rsquo;t scored.</li>
+    <li><strong>Excluded:</strong> A single solo chat. Real big projects need a split.</li>
+  </ul>
+</section>
+
+<!-- SECTION 2: Setup -->
+<section id="setup" class="bench-section" aria-labelledby="h-setup">
+  <h2 id="h-setup">2. Setup</h2>
+  <ul class="clean-list">
+    <li><strong>Specimen:</strong> Linkshelf (<code>SPEC.md</code>). A bookmark API plus a one-page UI, Node with zero dependencies, ~400 LOC, 6 milestones.</li>
+    <li><strong>Model:</strong> Sonnet 5.5, effort low, everywhere.</li>
+    <li><strong>Environment:</strong> The same plugins and MCP in all runs (realistic, not stripped).</li>
+    <li><strong>APCD version:</strong> Published, without the auto-refresh hook.</li>
+  </ul>
+
+  <h3>Metrics</h3>
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Metric</th>
+          <th scope="col">What it is</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Input units (main)</strong></td>
+          <td><code>in&times;1 + 5-min cache write&times;1.25 + 1-hour cache write&times;2 + cache read&times;0.1</code>, which is Anthropic&rsquo;s relative pricing.</td>
+        </tr>
+        <tr>
+          <td><strong>Total units</strong></td>
+          <td>Input units + output&times;5. Desktop sub-agent logs under-record output, so O&rsquo;s desktop totals are too low.</td>
+        </tr>
+        <tr>
+          <td><strong>CLI cost</strong></td>
+          <td>Claude Code&rsquo;s own $ estimate (CLI runs only).</td>
+        </tr>
+        <tr>
+          <td><strong>Quality</strong></td>
+          <td>Hidden API tests /30, scripted UI checks /20, own tests, LOC, blind visual rating (pending).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECTION 3: All runs -->
+<section id="runs" class="bench-section" aria-labelledby="h-runs">
+  <h2 id="h-runs">3. All Runs</h2>
+
+  <div class="table-wrap">
+    <table class="data-table highlight-table">
+      <thead>
+        <tr>
+          <th scope="col">Run</th>
+          <th scope="col">Arm</th>
+          <th scope="col">Input Units</th>
+          <th scope="col">Total Units*</th>
+          <th scope="col">CLI Cost $</th>
+          <th scope="col">Calls</th>
+          <th scope="col">Chats + Sub</th>
+          <th scope="col">Hidden API</th>
+          <th scope="col">UI Checks</th>
+          <th scope="col">Own Tests</th>
+          <th scope="col">LOC</th>
+          <th scope="col">Min</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="row-o">
+          <td><code>O-1 - Copy</code></td>
+          <td><span class="badge badge-o">O</span></td>
+          <td><strong>954k</strong></td>
+          <td>990k</td>
+          <td>&ndash;</td>
+          <td>78</td>
+          <td>1 + 6</td>
+          <td>30/30</td>
+          <td>20/20</td>
+          <td>49/50</td>
+          <td>387</td>
+          <td>&ndash;</td>
+        </tr>
+        <tr class="row-p">
+          <td><code>P-1</code></td>
+          <td><span class="badge badge-p">P</span></td>
+          <td><strong>602k</strong></td>
+          <td>737k</td>
+          <td>&ndash;</td>
+          <td>45</td>
+          <td>6 + 0</td>
+          <td>30/30</td>
+          <td>20/20</td>
+          <td>17/17</td>
+          <td>368</td>
+          <td>&ndash;</td>
+        </tr>
+        <tr class="row-o">
+          <td><code>r2-O-1</code></td>
+          <td><span class="badge badge-o">O</span></td>
+          <td><strong>405k</strong></td>
+          <td>611k</td>
+          <td>$1.06</td>
+          <td>59</td>
+          <td>1 + 6</td>
+          <td>30/30</td>
+          <td>20/20</td>
+          <td>30/30</td>
+          <td>386</td>
+          <td>8</td>
+        </tr>
+        <tr class="row-o">
+          <td><code>r2-O-1-claude-projects</code></td>
+          <td><span class="badge badge-o">O</span></td>
+          <td><strong>970k</strong></td>
+          <td>1013k</td>
+          <td>&ndash;</td>
+          <td>73</td>
+          <td>1 + 6</td>
+          <td>30/30</td>
+          <td>20/20</td>
+          <td>46/46</td>
+          <td>475</td>
+          <td>&ndash;</td>
+        </tr>
+        <tr class="row-p">
+          <td><code>r2-P-3 (folder r2-O-2)</code></td>
+          <td><span class="badge badge-p">P</span></td>
+          <td><strong>361k</strong></td>
+          <td>465k</td>
+          <td>$0.91</td>
+          <td>38</td>
+          <td>6 + 0</td>
+          <td>30/30</td>
+          <td>20/20</td>
+          <td>12/12</td>
+          <td>334</td>
+          <td>4</td>
+        </tr>
+        <tr class="row-o">
+          <td><code>r2-O-2-corrected</code></td>
+          <td><span class="badge badge-o">O</span></td>
+          <td><strong>415k</strong></td>
+          <td>657k</td>
+          <td>$1.16</td>
+          <td>53</td>
+          <td>1 + 6</td>
+          <td>30/30</td>
+          <td>20/20</td>
+          <td>48/48</td>
+          <td>442</td>
+          <td>9</td>
+        </tr>
+        <tr class="row-p">
+          <td><code>r2-P-1</code></td>
+          <td><span class="badge badge-p">P</span></td>
+          <td><strong>394k</strong></td>
+          <td>523k</td>
+          <td>$1.01</td>
+          <td>41</td>
+          <td>6 + 0</td>
+          <td>30/30</td>
+          <td>20/20</td>
+          <td>17/17</td>
+          <td>403</td>
+          <td>4</td>
+        </tr>
+        <tr class="row-p">
+          <td><code>r2-P-2</code></td>
+          <td><span class="badge badge-p">P</span></td>
+          <td><strong>377k</strong></td>
+          <td>497k</td>
+          <td>$0.97</td>
+          <td>39</td>
+          <td>6 + 0</td>
+          <td>30/30</td>
+          <td>20/20</td>
+          <td>17/17</td>
+          <td>344</td>
+          <td>4</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="footnote-text"><em>* Desktop runs (no <code>r2-</code> CLI cost) under-record sub-agent output, so O&rsquo;s desktop totals are too low.</em><br>
+  <em>Note: <code>r2-P-3</code> ran in the folder named <code>r2-O-2</code> by mistake. It is an APCD run.</em></p>
+
+  <!-- Desktop Breakdown -->
+  <div class="sub-card">
+    <h3>3.1 Desktop app: APCD vs Claude projects</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Dimension</th>
+            <th scope="col">APCD (P-1)</th>
+            <th scope="col">Projects (O-1 Copy, r2-O-1-claude-projects)</th>
+            <th scope="col">O &divide; P</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Input units</td>
+            <td><strong>602k</strong></td>
+            <td><strong>954k &middot; 970k</strong> (within 2%)</td>
+            <td><strong class="highlight-val">1.6&times;</strong></td>
+          </tr>
+          <tr>
+            <td>API calls</td>
+            <td>45</td>
+            <td>78 &middot; 73</td>
+            <td>1.7&times;</td>
+          </tr>
+          <tr>
+            <td>Tests</td>
+            <td>30/30 &middot; 20/20</td>
+            <td>30/30 &middot; 20/20</td>
+            <td>equal</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="insight-box">
+      <strong>Note:</strong> The coordinator chat alone re-read <strong>1.8&ndash;2.4M cached tokens</strong>.
+    </div>
+  </div>
+
+  <!-- CLI Breakdown -->
+  <div class="sub-card">
+    <h3>3.2 CLI: APCD vs session + sub-agents (averages)</h3>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">Dimension</th>
+            <th scope="col">APCD (3 runs)</th>
+            <th scope="col">Sub-agents (2 runs)</th>
+            <th scope="col">O &divide; P</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Input units</td>
+            <td>377k (361&ndash;394k)</td>
+            <td>410k (405&ndash;415k)</td>
+            <td><strong>1.09&times;</strong></td>
+          </tr>
+          <tr>
+            <td>Total units</td>
+            <td>495k</td>
+            <td>634k</td>
+            <td><strong class="highlight-val">1.28&times;</strong></td>
+          </tr>
+          <tr>
+            <td>CLI cost</td>
+            <td>$0.96</td>
+            <td>$1.11</td>
+            <td><strong class="highlight-val">1.15&times;</strong></td>
+          </tr>
+          <tr>
+            <td>API calls</td>
+            <td>39</td>
+            <td>56</td>
+            <td>1.4&times;</td>
+          </tr>
+          <tr>
+            <td>Time</td>
+            <td><strong>4 min</strong></td>
+            <td>8.5 min</td>
+            <td><strong class="highlight-val">2.1&times; slower</strong></td>
+          </tr>
+          <tr>
+            <td>Tests</td>
+            <td>30/30 &middot; 20/20</td>
+            <td>30/30 &middot; 20/20</td>
+            <td>equal</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="insight-box">
+      <ul>
+        <li><strong>Runs are stable:</strong> APCD varied &plusmn;4% across 3 runs, O varied &plusmn;1% across 2.</li>
+        <li><strong>APCD&rsquo;s biggest cost is its cache price:</strong> Each new chat writes the 1-hour cache at 2&times; base price; sub-agents write the 5-minute cache at 1.25&times;. That is about 2/3 of APCD&rsquo;s input units.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 4: Desktop vs CLI -->
+<section id="surface" class="bench-section" aria-labelledby="h-surface">
+  <h2 id="h-surface">4. Desktop App vs CLI</h2>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th scope="col">Arm</th>
+          <th scope="col">Desktop</th>
+          <th scope="col">CLI</th>
+          <th scope="col">Change</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>APCD</td>
+          <td>602k</td>
+          <td>377k</td>
+          <td>&minus;37%</td>
+        </tr>
+        <tr>
+          <td>Orchestrator</td>
+          <td>962k</td>
+          <td>410k</td>
+          <td><strong class="highlight-val">&minus;57%</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The desktop app adds overhead per agent, so orchestration (7 agents) pays it 7 times.</p>
+</section>
+
+<!-- SECTION 5: Findings -->
+<section id="findings" class="bench-section" aria-labelledby="h-findings">
+  <h2 id="h-findings">5. Findings</h2>
+
+  <div class="findings-grid">
+    <div class="finding-tile">
+      <div class="finding-num">1</div>
+      <div>
+        <h3>APCD never cost more at equal quality</h3>
+        <p>It was <strong>1.6&times; cheaper</strong> than desktop projects, and <strong>1.15&times; cheaper</strong> in $ and <strong>2&times; faster</strong> than CLI sub-agents.</p>
+      </div>
+    </div>
+
+    <div class="finding-tile">
+      <div class="finding-num">2</div>
+      <div>
+        <h3>The manager agent is the tax</h3>
+        <p>Its context grows every step, and it waits between sub-agents, which slows things down.</p>
+      </div>
+    </div>
+
+    <div class="finding-tile">
+      <div class="finding-num">3</div>
+      <div>
+        <h3>Surface matters as much as method</h3>
+        <p>The desktop app made orchestration about <strong>2.3&times; pricier</strong> than the CLI.</p>
+      </div>
+    </div>
+
+    <div class="finding-tile">
+      <div class="finding-num">4</div>
+      <div>
+        <h3>Orchestrators don't always orchestrate</h3>
+        <p>&ldquo;Use sub-agents as you see fit&rdquo; produced zero sub-agents, so the O prompt forces them.</p>
+      </div>
+    </div>
+
+    <div class="finding-tile">
+      <div class="finding-num">5</div>
+      <div>
+        <h3>Quality is equal on every automated check</h3>
+        <p>The visual comparison is still pending blind rating (round 1&rsquo;s APCD UI looked plainer).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION 6: Caveats -->
+<section id="caveats" class="bench-section" aria-labelledby="h-caveats">
+  <h2 id="h-caveats">6. Caveats</h2>
+  <ul class="clean-list">
+    <li>It&rsquo;s a small, focused specimen (about 400 LOC). Big, messy projects may differ.</li>
+    <li>The desktop comparison is n=1 for APCD vs n=2 for projects.</li>
+    <li>APCD trades a little laziness: you open each new chat yourself, while orchestrators do it for you.</li>
+    <li>It was a single model and effort level (Sonnet 5.5, low).</li>
+  </ul>
+</section>
+
+<!-- SECTION 7: Reproduction -->
+<section id="reproduce" class="bench-section" aria-labelledby="h-reproduce">
+  <h2 id="h-reproduce">7. How to Run More</h2>
+  <div class="code">
+    <pre>cd S:/PROJECTS/dir2_learner/apcd-benchmark/apcd
+node tools/bench.mjs run P &lt;new-name&gt;
+node tools/bench.mjs run O &lt;new-name&gt;
+node tools/bench.mjs score &lt;folder-name&gt;
+node tools/bench.mjs blind r2</pre>
+  </div>
+  <ul class="clean-list">
+    <li><code>run</code>: CLI, auto-scored.</li>
+    <li><code>score</code>: for a manual desktop run in <code>S:/bench/&lt;folder-name&gt;</code>.</li>
+    <li><code>blind</code>: blind visual rating page.</li>
+    <li>Use a new name per run. Folders are never reused.</li>
+  </ul>
+</section>
+
+<!-- Back to top bar -->
+<div class="back-bar">
+  <a href="#main">&#9650; Return to top</a> &middot; <a href="../">Home page</a>
+</div>
+
+</main>
+</div>
+<footer>
+<nav aria-label="Footer"><ul>
+<li><a href="../">Home</a></li>
+<li><a href="./">Benchmark</a></li>
+<li><a href="../privacy/">Privacy</a></li>
+<li><a href="../terms/">Terms</a></li>
+<li><a href="https://github.com/Karthikeshwar1/APCD">GitHub</a></li>
+</ul></nav>
+</footer>
+</div>
+<div id="live" class="sr" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -60,6 +60,11 @@ code{font:.9em var(--mono)}
 .code button:active{border-color:var(--lo) var(--hi) var(--hi) var(--lo)}
 .code.nocopy pre{padding-right:12px}
 
+/* Video Demo Frame (Vertical 9:16 Video, Tap to Pause/Play) */
+.video-frame{max-width:260px;margin:0 auto 28px;background:#000;border:2px solid;border-color:var(--lo) var(--hi) var(--hi) var(--lo);outline:1px solid var(--ink);cursor:pointer;line-height:0}
+.video-frame video{display:block;width:100%;height:auto;aspect-ratio:720/1280;background:#000;cursor:pointer}
+.video-frame video::-webkit-media-controls{display:none!important}
+
 .ref{margin-top:34px;padding-top:6px;border-top:1px dotted var(--ink)}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
 .ref section{margin:0 0 20px}

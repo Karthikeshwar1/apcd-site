@@ -21,4 +21,16 @@ document.documentElement.classList.add('js');
     };
     box.appendChild(b);
   });
+
+  // Tap to pause/play video
+  var v = document.getElementById('demo-video');
+  if (v) {
+    v.addEventListener('click', function(){
+      if (v.paused) {
+        v.play();
+      } else {
+        v.pause();
+      }
+    });
+  }
 })();

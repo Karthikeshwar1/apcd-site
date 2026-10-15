@@ -22,15 +22,47 @@ document.documentElement.classList.add('js');
     box.appendChild(b);
   });
 
-  // Tap to pause/play video
+  // Tap to pause/play video + bulletproof autoplay
   var v = document.getElementById('demo-video');
   if (v) {
-    v.addEventListener('click', function(){
+    v.muted = true;
+    v.defaultMuted = true;
+
+    // Force autoplay on page load across all browsers
+    var startAutoplay = function(){
+      var p = v.play();
+      if (p !== undefined) {
+        p.catch(function(){});
+      }
+    };
+    if (v.readyState >= 2) {
+      startAutoplay();
+    } else {
+      v.addEventListener('canplay', startAutoplay, { once: true });
+      v.addEventListener('loadeddata', startAutoplay, { once: true });
+    }
+
+    // Toggle pause / resume on tap or click
+    var toggleVideo = function(e){
+      if (e) {
+        e.preventDefault();
+      }
       if (v.paused) {
         v.play();
       } else {
         v.pause();
       }
+    };
+
+    v.addEventListener('click', toggleVideo);
+    // Touch support for responsive mobile screens
+    var touchMoved = false;
+    v.addEventListener('touchmove', function(){ touchMoved = true; }, { passive: true });
+    v.addEventListener('touchend', function(e){
+      if (!touchMoved) {
+        toggleVideo(e);
+      }
+      touchMoved = false;
     });
   }
 })();
